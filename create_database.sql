@@ -12,11 +12,12 @@ create table error
 
 create table aws_ami
 (
-  ami_name      text not null
-    constraint aws_ami_pkey
-    primary key,
+  ami_region    text not null,
+  ami_name      text not null,
   ami_id        text,
-  key_pair_name text
+  key_pair_name text,
+  constraint aws_ami_pkey
+    primary key (ami_region, ami_name)
 );
 
 create table aws_credentials
