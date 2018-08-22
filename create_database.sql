@@ -12,7 +12,7 @@ create table error
 
 create table aws_ami
 (
-  ami_region    text not null,
+  region_name    text not null,
   ami_name      text not null,
   ami_id        text,
   key_pair_name text,
