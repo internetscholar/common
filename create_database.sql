@@ -198,14 +198,14 @@ create table twitter_hydrated_tweet
 );
 
 
-create table http_status
+create table url_http_status
 (
   status_code integer not null primary key,
   message text,
   description text
 );
 
-insert into http_status (status_code, message, description) values
+insert into url_http_status (status_code, message, description) values
 (100, 'Continue', 'The server has received the request headers and the client should proceed to send the request body (in the case of a request for which a body needs to be sent; for example, a POST request). Sending a large request body to a server after a request has been rejected for inappropriate headers would be inefficient. To have a server check the request''s headers, a client must send Expect: 100-continue as a header in its initial request and receive a 100 Continue status code in response before sending the body. If the client receives an error code such as 403 (Forbidden) or 405 (Method Not Allowed) then it shouldn''t send the request''s body. The response 417 Expectation Failed indicates that the request should be repeated without the Expect header as it indicates that the server doesn''t support expectations (this is the case, for example, of HTTP/1.0 servers).'),
 (101, 'Switching Protocols', 'The requester has asked the server to switch protocols and the server has agreed to do so.'),
 (102, 'Processing (WebDAV; RFC 2518)', 'A WebDAV request may contain many sub-requests involving file operations, requiring a long time to complete the request. This code indicates that the server has received and is processing the request, but no response is available yet. This prevents the client from timing out and assuming the request was lost.'),
@@ -300,7 +300,7 @@ create table url
   final_url text not null,
   status_code integer not null
     constraint fk_url_status_code
-      references http_status
+      references url_http_status
         on update cascade on delete cascade,
   project_name text not null
     constraint fk_url_project
