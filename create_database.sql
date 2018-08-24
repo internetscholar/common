@@ -150,6 +150,7 @@ create table twitter_scraping_attempt
   until       timestamp(0) with time zone not null,
   twitter_url text,
   ip text,
+  empty boolean default false,
 	created_at timestamp with time zone default now(),
   constraint fk_twitter_scraping_attempt
     foreign key (query_alias, since)
