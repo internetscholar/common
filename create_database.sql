@@ -116,11 +116,11 @@ create table twitter_scraping_query
     constraint twitter_scraping_query_pkey
     primary key,
   search_terms         text,
-  since                timestamp not null,
-  until                timestamp not null,
+  since                timestamp(0) not null,
+  until                timestamp(0) not null,
   language             text,
-  tolerance_in_seconds integer not null default 600,
-  subquery_interval_in_seconds integer not null default 3600,
+  tolerance_in_seconds interval(0) not null default '00:10:00'::interval,
+  subquery_interval_in_seconds interval(0) not null default '01:00:00':interval,
 	created_at timestamp default now(),
   project_name text not null
     constraint fk_project_twitter
@@ -132,8 +132,8 @@ create table twitter_scraping_query
 create table twitter_scraping_subquery
 (
   query_alias text not null,
-  since       timestamp not null,
-  complete    boolean,
+  since       timestamp(0) not null,
+  complete    boolean default FALSE ,
 	created_at timestamp default now(),
   constraint fk_twitter_scraping_subquery
     foreign key (query_alias)
@@ -146,8 +146,8 @@ create table twitter_scraping_subquery
 create table twitter_scraping_attempt
 (
   query_alias text not null,
-  since       timestamp not null,
-  until       timestamp not null,
+  since       timestamp(0) not null,
+  until       timestamp(0) not null,
   twitter_url text,
   ip text,
 	created_at timestamp default now(),
@@ -162,10 +162,10 @@ create table twitter_scraping_attempt
 create table twitter_dry_tweet
 (
   query_alias text not null,
-  since       timestamp not null,
-  until       timestamp not null,
+  since       timestamp(0) not null,
+  until       timestamp(0) not null,
   tweet_id    bigint not null,
-	published_at timestamp,
+	published_at timestamp(0) not null,
   constraint fk_twitter_dry_tweet
     foreign key (query_alias, since, until)
       references twitter_scraping_attempt(query_alias, since, until)
