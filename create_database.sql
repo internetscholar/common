@@ -5,7 +5,7 @@ create table error
 			primary key,
 	current_record jsonb,
 	error text,
-	time_error timestamp default now(),
+	time_error timestamp with time zone default now(),
 	module text,
 	ip text
 );
@@ -34,7 +34,7 @@ create table project
 	project_name text not null constraint project_pkey primary key,
 	active boolean default TRUE,
 	aws_region text,
-	created_at timestamp default now()
+	created_at timestamp with time zone default now()
 );
 
 create table google_search_query
@@ -52,7 +52,7 @@ create table google_search_query
 	geo_tci text,
 	geo_uule text,
 	sort_by_date boolean default false,
-	created_at timestamp default now(),
+	created_at timestamp with time zone default now(),
   project_name text not null
     constraint fk_project_google
       references project
@@ -64,7 +64,7 @@ create table google_search_subquery
 	query_alias text not null,
 	query_date date not null,
 	query_url text,
-	created_at timestamp default now(),
+	created_at timestamp with time zone default now(),
   constraint google_search_subquery_pk
     primary key(query_alias, query_date),
 	constraint fk_google_search_query
@@ -77,7 +77,7 @@ create table google_search_attempt
 (
   query_alias text not null,
   query_date date not null,
-	created_at timestamp default now(),
+	created_at timestamp with time zone default now(),
 	success boolean,
 	ip text,
   constraint fk_google_search_attempt
@@ -116,12 +116,12 @@ create table twitter_scraping_query
     constraint twitter_scraping_query_pkey
     primary key,
   search_terms         text,
-  since                timestamp(0) not null,
-  until                timestamp(0) not null,
+  since                timestamp(0) with time zone not null,
+  until                timestamp(0) with time zone not null,
   language             text,
   tolerance_in_seconds interval(0) not null default '00:10:00'::interval,
   subquery_interval_in_seconds interval(0) not null default '01:00:00':interval,
-	created_at timestamp default now(),
+	created_at timestamp with time zone default now(),
   project_name text not null
     constraint fk_project_twitter
       references project
@@ -132,9 +132,9 @@ create table twitter_scraping_query
 create table twitter_scraping_subquery
 (
   query_alias text not null,
-  since       timestamp(0) not null,
+  since       timestamp(0) with time zone not null,
   complete    boolean default FALSE ,
-	created_at timestamp default now(),
+	created_at timestamp with time zone default now(),
   constraint fk_twitter_scraping_subquery
     foreign key (query_alias)
       references twitter_scraping_query(query_alias)
@@ -146,11 +146,11 @@ create table twitter_scraping_subquery
 create table twitter_scraping_attempt
 (
   query_alias text not null,
-  since       timestamp(0) not null,
-  until       timestamp(0) not null,
+  since       timestamp(0) with time zone not null,
+  until       timestamp(0) with time zone not null,
   twitter_url text,
   ip text,
-	created_at timestamp default now(),
+	created_at timestamp with time zone default now(),
   constraint fk_twitter_scraping_attempt
     foreign key (query_alias, since)
       references twitter_scraping_subquery(query_alias, since)
@@ -162,10 +162,10 @@ create table twitter_scraping_attempt
 create table twitter_dry_tweet
 (
   query_alias text not null,
-  since       timestamp(0) not null,
-  until       timestamp(0) not null,
+  since       timestamp(0) with time zone not null,
+  until       timestamp(0) with time zone not null,
   tweet_id    bigint not null,
-	published_at timestamp(0) not null,
+	published_at timestamp(0) with time zone not null,
   constraint fk_twitter_dry_tweet
     foreign key (query_alias, since, until)
       references twitter_scraping_attempt(query_alias, since, until)
@@ -179,7 +179,7 @@ create table twitter_hydration_request
 		constraint twitter_hydration_request_pkey
 			primary key,
   ip text,
-	created_at timestamp default now()
+	created_at timestamp with time zone default now()
 );
 
 create table twitter_hydrated_tweet
@@ -295,7 +295,7 @@ insert into url_http_status (status_code, message, description) values
 create table url
 (
   url text not null,
-  accessed_at timestamp default now(),
+  accessed_at timestamp with time zone default now(),
   next text null,
   final_url text not null,
   status_code integer not null
@@ -319,7 +319,7 @@ create table url
 create table url_watson_nlp
 (
   url text not null,
-  created_at timestamp default now(),
+  created_at timestamp with time zone default now(),
   project_name text not null
     constraint fk_url_watson_nlp_project
       references project
@@ -335,7 +335,7 @@ create table url_watson_nlp
 create table url_facebook_stats
 (
   url text not null,
-  created_at timestamp default now(),
+  created_at timestamp with time zone default now(),
   project_name text not null
     constraint fk_url_facebook_stats_project
       references project
