@@ -1,7 +1,7 @@
 create table error
 (
 	id serial not null
-		constraint error_pkey
+		constraint error_primary_key
 			primary key,
 	current_record jsonb,
 	error text,
@@ -16,14 +16,14 @@ create table aws_ami
   ami_name      text not null,
   ami_id        text,
   key_pair_name text,
-  constraint aws_ami_pkey
-    primary key (ami_region, ami_name)
+  constraint aws_ami_primary_key
+    primary key (region_name, ami_name)
 );
 
 create table aws_credentials
 (
   aws_access_key_id     text not null
-    constraint aws_credentials_pkey
+    constraint aws_credentials_primary_key
     primary key,
   aws_secret_access_key text,
   region_name           text
@@ -31,7 +31,7 @@ create table aws_credentials
 
 create table project
 (
-	project_name text not null constraint project_pkey primary key,
+	project_name text not null constraint project_primary_key primary key,
 	active boolean default TRUE,
 	aws_region text,
 	created_at timestamp with time zone default now()
@@ -40,7 +40,7 @@ create table project
 create table google_search_query
 (
 	query_alias text not null
-		constraint google_search_pkey
+		constraint google_search_primary_key
 			primary key,
 	search_terms text,
 	initial_date date,
@@ -91,7 +91,7 @@ create table google_search_attempt
 create table google_search_result
 (
 	result_id serial not null
-		constraint google_result_pkey
+		constraint google_result_primary_key
 			primary key,
 	query_alias text,
 	query_date date,
@@ -113,14 +113,14 @@ create table google_search_result
 create table twitter_scraping_query
 (
   query_alias          text not null
-    constraint twitter_scraping_query_pkey
+    constraint twitter_scraping_query_primary_key
     primary key,
   search_terms         text,
   since                timestamp(0) with time zone not null,
   until                timestamp(0) with time zone not null,
   language             text,
   tolerance_in_seconds interval(0) not null default '00:10:00'::interval,
-  subquery_interval_in_seconds interval(0) not null default '01:00:00':interval,
+  subquery_interval_in_seconds interval(0) not null default '01:00:00'::interval,
 	created_at timestamp with time zone default now(),
   project_name text not null
     constraint fk_project_twitter
@@ -177,7 +177,7 @@ create table twitter_dry_tweet
 create table twitter_hydration_request
 (
 	request_id serial not null
-		constraint twitter_hydration_request_pkey
+		constraint twitter_hydration_request_primary_key
 			primary key,
   ip text,
 	created_at timestamp with time zone default now()
@@ -207,7 +207,7 @@ create table url_http_status
 );
 
 insert into url_http_status (status_code, message, description) values
-(100, 'Continue', 'The server has received the request headers and the client should proceed to send the request body (in the case of a request for which a body needs to be sent; for example, a POST request). Sending a large request body to a server after a request has been rejected for inappropriate headers would be inefficient. To have a server check the request''s headers, a client must send Expect: 100-continue as a header in its initial request and receive a 100 Continue status code in response before sending the body. If the client receives an error code such as 403 (Forbidden) or 405 (Method Not Allowed) then it shouldn''t send the request''s body. The response 417 Expectation Failed indicates that the request should be repeated without the Expect header as it indicates that the server doesn''t support expectations (this is the case, for example, of HTTP/1.0 servers).'),
+(100, 'Continue', 'The server has received the request headers and the client should proceed to send the request body (in the case of a request for which a body needs to be sent; for example, a POST request). Sending a large request body to a server after a request has been rejected for inappropriate headers would be inefficient. To have a server check the request''s headers, a client must send Expect: 100-continue as a header in its initial request and receive a 100 Continue status code in response before sending the body. If the client receives an error code such as 403 (Forbidden) or 405 (Method Not Allowed) then it should not send the request''s body. The response 417 Expectation Failed indicates that the request should be repeated without the Expect header as it indicates that the server does not support expectations (this is the case, for example, of HTTP/1.0 servers).'),
 (101, 'Switching Protocols', 'The requester has asked the server to switch protocols and the server has agreed to do so.'),
 (102, 'Processing (WebDAV; RFC 2518)', 'A WebDAV request may contain many sub-requests involving file operations, requiring a long time to complete the request. This code indicates that the server has received and is processing the request, but no response is available yet. This prevents the client from timing out and assuming the request was lost.'),
 (103, 'Early Hints (RFC 8297)', 'Used to return some response headers before final HTTP message.'),
@@ -219,7 +219,7 @@ insert into url_http_status (status_code, message, description) values
 (205, 'Reset Content', 'The server successfully processed the request, but is not returning any content. Unlike a 204 response, this response requires that the requester reset the document view.'),
 (206, 'Partial Content (RFC 7233)', 'The server is delivering only part of the resource (byte serving) due to a range header sent by the client. The range header is used by HTTP clients to enable resuming of interrupted downloads, or split a download into multiple simultaneous streams.'),
 (207, 'Multi-Status (WebDAV; RFC 4918)', 'The message body that follows is by default an XML message and can contain a number of separate response codes, depending on how many sub-requests were made.'),
-(208, 'Already Reported (WebDAV; RFC 5842)', 'The members of a DAV binding have already been enumerated in a preceding part of the (multistatus) response, and are not being included again.'),
+(208, 'Already Reported (WebDAV; RFC 5842)', 'The members of a DAV binding have already been enumerated in a preceding part of the (multi-status) response, and are not being included again.'),
 (226, 'IM Used (RFC 3229)', 'The server has fulfilled a request for the resource, and the response is a representation of the result of one or more instance-manipulations applied to the current instance.'),
 (300, 'Multiple Choices', 'Indicates multiple options for the resource from which the client may choose (via agent-driven content negotiation). For example, this code could be used to present multiple video format options, to list files with different filename extensions, or to suggest word-sense disambiguation.'),
 (301, 'Moved Permanently', 'This and all future requests should be directed to the given URI.'),
@@ -232,7 +232,7 @@ insert into url_http_status (status_code, message, description) values
 (308, 'Permanent Redirect (RFC 7538)', 'The request and all future requests should be repeated using another URI. 307 and 308 parallel the behaviors of 302 and 301, but do not allow the HTTP method to change. So, for example, submitting a form to a permanently redirected resource may continue smoothly.'),
 (400, 'Bad Request', 'The server cannot or will not process the request due to an apparent client error (e.g., malformed request syntax, size too large, invalid request message framing, or deceptive request routing).'),
 (401, 'Unauthorized (RFC 7235)', 'Similar to 403 Forbidden, but specifically for use when authentication is required and has failed or has not yet been provided. The response must include a WWW-Authenticate header field containing a challenge applicable to the requested resource. See Basic access authentication and Digest access authentication. 401 semantically means "unauthenticated", i.e. the user does not have the necessary credentials. Note: Some sites issue HTTP 401 when an IP address is banned from the website (usually the website domain) and that specific address is refused permission to access a website.'),
-(402, 'Payment Required', 'Reserved for future use. The original intention was that this code might be used as part of some form of digital cash or micropayment scheme, as proposed for example by GNU Taler, but that has not yet happened, and this code is not usually used. Google Developers API uses this status if a particular developer has exceeded the daily limit on requests. Sipgate uses this code if an account does not have sufficient funds to start a call. Shopify uses this code when the store has not paid their fees and is temporarily disabled. '),
+(402, 'Payment Required', 'Reserved for future use. The original intention was that this code might be used as part of some form of digital cash or micro payment scheme, as proposed for example by GNU Taler, but that has not yet happened, and this code is not usually used. Google Developers API uses this status if a particular developer has exceeded the daily limit on requests. Sipgate uses this code if an account does not have sufficient funds to start a call. Shopify uses this code when the store has not paid their fees and is temporarily disabled. '),
 (403, 'Forbidden', 'The request was valid, but the server is refusing action. The user might not have the necessary permissions for a resource, or may need an account of some sort.'),
 (404, 'Not Found', 'The requested resource could not be found but may be available in the future. Subsequent requests by the client are permissible.'),
 (405, 'Method Not Allowed', 'A request method is not supported for the requested resource; for example, a GET request on a form that requires data to be presented via POST, or a PUT request on a read-only resource.'),
@@ -250,7 +250,7 @@ insert into url_http_status (status_code, message, description) values
 (417, 'Expectation Failed', 'The server cannot meet the requirements of the Expect request-header field.'),
 (418, 'I''m a teapot (RFC 2324, RFC 7168)', 'This code was defined in 1998 as one of the traditional IETF April Fools'' jokes, in RFC 2324, Hyper Text Coffee Pot Control Protocol, and is not expected to be implemented by actual HTTP servers. The RFC specifies this code should be returned by teapots requested to brew coffee. This HTTP status is used as an Easter egg in some websites, including Google.com.'),
 (421, 'Misdirected Request (RFC 7540)', 'The request was directed at a server that is not able to produce a response (for example because of connection reuse).'),
-(422, 'Unprocessable Entity (WebDAV; RFC 4918)', 'The request was well-formed but was unable to be followed due to semantic errors.'),
+(422, 'Un-processable Entity (WebDAV; RFC 4918)', 'The request was well-formed but was unable to be followed due to semantic errors.'),
 (423, 'Locked (WebDAV; RFC 4918)', 'The resource that is being accessed is locked.'),
 (424, 'Failed Dependency (WebDAV; RFC 4918)', 'The request failed because it depended on another request and that request failed (e.g., a PROPPATCH).'),
 (426, 'Upgrade Required', 'The client should switch to a different protocol such as TLS/1.0, given in the Upgrade header field.'),
@@ -268,10 +268,10 @@ insert into url_http_status (status_code, message, description) values
 (507, 'Insufficient Storage (WebDAV; RFC 4918)', 'The server is unable to store the representation needed to complete the request.'),
 (508, 'Loop Detected (WebDAV; RFC 5842)', 'The server detected an infinite loop while processing the request (sent in lieu of 208 Already Reported).'),
 (510, 'Not Extended (RFC 2774)', 'Further extensions to the request are required for the server to fulfill it.'),
-(511, 'Network Authentication Required (RFC 6585)', 'The client needs to authenticate to gain network access. Intended for use by intercepting proxies used to control access to the network (e.g., "captive portals" used to require agreement to Terms of Service before granting full Internet access via a Wi-Fi hotspot).'),
+(511, 'Network Authentication Required (RFC 6585)', 'The client needs to authenticate to gain network access. Intended for use by intercepting proxies used to control access to the network (e.g., "captive portals" used to require agreement to Terms of Service before granting full Internet access via a Wi-Fi hot-spot).'),
 (218, 'This is fine (Apache Web Server)', 'Used as a catch-all error condition for allowing response bodies to flow through Apache when ProxyErrorOverride is enabled. When ProxyErrorOverride is enabled in Apache, response bodies that contain a status code of 4xx or 5xx are automatically discarded by Apache in favor of a generic response or a custom response specified by the ErrorDocument directive.'),
 (420, 'Enhance Your Calm (Twitter)', 'Returned by version 1 of the Twitter Search and Trends API when the client is being rate limited; versions 1.1 and later use the 429 Too Many Requests response code instead.'),
-(450, 'Blocked by Windows Parental Controls (Microsoft)', 'The Microsoft extension code indicated when Windows Parental Controls are turned on and are blocking access to the requested webpage.'),
+(450, 'Blocked by Windows Parental Controls (Microsoft)', 'The Microsoft extension code indicated when Windows Parental Controls are turned on and are blocking access to the requested web page.'),
 (498, 'Invalid Token (Esri)', 'Returned by ArcGIS for Server. Code 498 indicates an expired or otherwise invalid token.'),
 (499, 'Token Required (Esri)', 'Returned by ArcGIS for Server. Code 499 indicates that a token is required but was not submitted.'),
 (509, 'Bandwidth Limit Exceeded (Apache Web Server/cPanel)', 'The server has exceeded the bandwidth specified by the server administrator; this is often used by shared hosting providers to limit the bandwidth of customers.'),
@@ -291,7 +291,7 @@ insert into url_http_status (status_code, message, description) values
 (524, 'A Timeout Occurred', 'Cloudflare was able to complete a TCP connection to the origin server, but did not receive a timely HTTP response.'),
 (525, 'SSL Handshake Failed', 'Cloudflare could not negotiate a SSL/TLS handshake with the origin server.'),
 (526, 'Invalid SSL Certificate', 'Cloudflare could not validate the SSL/TLS certificate that the origin server presented.'),
-(527, 'Railgun Error', 'Error 527 indicates that the request timed out or failed after the WAN connection had been established.');
+(527, 'Rail-gun Error', 'Error 527 indicates that the request timed out or failed after the WAN connection had been established.');
 
 create table url
 (
