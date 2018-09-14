@@ -22,11 +22,12 @@ create table aws_ami
 
 create table aws_credentials
 (
+  account               text,
   aws_access_key_id     text not null
     constraint aws_credentials_primary_key
     primary key,
   aws_secret_access_key text,
-  region_name           text
+	created_at timestamp with time zone default now()
 );
 
 create table project
@@ -103,6 +104,7 @@ create table google_search_result
 	blurb_text text,
 	blurb_html text,
 	missing text,
+  result_type text,
   constraint fk_google_search_result
     foreign key (query_alias, query_date)
       references google_search_subquery (query_alias, query_date)
@@ -119,8 +121,8 @@ create table twitter_scraping_query
   since                timestamp(0) with time zone not null,
   until                timestamp(0) with time zone not null,
   language             text,
-  tolerance_in_seconds interval(0) not null default '00:10:00'::interval,
-  subquery_interval_in_seconds interval(0) not null default '01:00:00'::interval,
+  tolerance_in_seconds interval(0) not null default '01:00:00'::interval,
+  subquery_interval_in_seconds interval(0) not null default '1 day'::interval,
 	created_at timestamp with time zone default now(),
   project_name text not null
     constraint fk_project_twitter
@@ -291,7 +293,15 @@ insert into url_http_status (status_code, message, description) values
 (524, 'A Timeout Occurred', 'Cloudflare was able to complete a TCP connection to the origin server, but did not receive a timely HTTP response.'),
 (525, 'SSL Handshake Failed', 'Cloudflare could not negotiate a SSL/TLS handshake with the origin server.'),
 (526, 'Invalid SSL Certificate', 'Cloudflare could not validate the SSL/TLS certificate that the origin server presented.'),
-(527, 'Rail-gun Error', 'Error 527 indicates that the request timed out or failed after the WAN connection had been established.');
+(527, 'Rail-gun Error', 'Error 527 indicates that the request timed out or failed after the WAN connection had been established.'),
+(600, 'WebScholar: 1', 'Exception during URL validation'),
+(601, 'WebScholar: 2', 'Schema is not HTTPS or HTTP'),
+(999, 'Request denied', 'LinkedIn does not want to share data'),
+(479, 'Unknown error', 'Unknown error'),
+(596, 'Unknown error', 'Unknown error'),
+(456, 'Unknown error', 'Unknown error'),
+(210, 'Unknown error', 'Unknown error')
+on conflict do nothing;
 
 create table url
 (
@@ -337,6 +347,8 @@ create table url_facebook_stats
 (
   url text not null,
   created_at timestamp with time zone default now(),
+  stats jsonb,
+  og_object jsonb,
   project_name text not null
     constraint fk_url_facebook_stats_project
       references project
@@ -346,4 +358,65 @@ create table url_facebook_stats
     foreign key (project_name, url)
       references url(project_name, url)
         on update cascade on delete cascade
+);
+
+
+create table twitter_credentials
+(
+  account             text,
+  email               text,
+  app_name            text,
+  app_id              text not null
+    constraint twitter_credentials_primary_key
+    primary key,
+  consumer_key        text,
+  consumer_secret     text,
+  access_token        text,
+  access_token_secret text,
+	created_at timestamp with time zone default now()
+);
+
+create table facebook_user_credentials
+(
+  email        text not null
+    constraint facebook_user_credentials_primary_key
+    primary key,
+  access_token text,
+	created_at timestamp with time zone default now()
+);
+
+create table facebook_app_credentials
+(
+  app_name   text not null
+    constraint facebook_credentials_primary_key
+    primary key,
+  app_id     text,
+  app_secret text,
+	created_at timestamp with time zone default now()
+);
+
+
+create table watson_credentials
+(
+  url      text,
+  username text not null,
+  password text,
+  email    text not null
+    constraint watson_credentials_email_primary_key
+    primary key,
+	created_at timestamp with time zone default now()
+);
+
+
+create table yandex_email
+(
+  username         text not null,
+  first_name       text,
+  last_name        text,
+  password_email   text,
+  musician_surname text,
+  created_at       timestamp with time zone default now(),
+  email            text not null
+    constraint yandex_email_primary_key
+    primary key
 );
